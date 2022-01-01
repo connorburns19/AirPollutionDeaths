@@ -1,0 +1,187 @@
+csc343h-burnsco2=> \i schema.ddl
+
+--Create schema, create table, drop table output follows, not including since not tidy--
+
+csc343h-burnsco2=> \d emissions
+           Table "populationandpollution.emissions"
+  Column  |       Type       | Collation | Nullable | Default 
+----------+------------------+-----------+----------+---------
+ location | text             |           | not null | 
+ year     | integer          |           | not null | 
+ tonnes   | double precision |           | not null | 
+Indexes:
+    "emissions_pkey" PRIMARY KEY, btree (location, year)
+Check constraints:
+    "emissions_tonnes_check" CHECK (tonnes >= 0::double precision)
+    "emissions_year_check" CHECK (year >= 0)
+Foreign-key constraints:
+    "emissions_location_fkey" FOREIGN KEY (location, year) REFERENCES population(location, year)
+
+csc343h-burnsco2=> \d population
+      Table "populationandpollution.population"
+  Column  |  Type   | Collation | Nullable | Default 
+----------+---------+-----------+----------+---------
+ location | text    |           | not null | 
+ year     | integer |           | not null | 
+ popvalue | integer |           | not null | 
+Indexes:
+    "population_pkey" PRIMARY KEY, btree (location, year)
+Check constraints:
+    "population_popvalue_check" CHECK (popvalue >= 0)
+    "population_year_check" CHECK (year >= 0)
+Referenced by:
+    TABLE "emissions" CONSTRAINT "emissions_location_fkey" FOREIGN KEY (location, year) REFERENCES population(location, year)
+    TABLE "pollutiondeathsbylocation" CONSTRAINT "pollutiondeathsbylocation_location_fkey" FOREIGN KEY (location, year) REFERENCES population(location, year)
+
+csc343h-burnsco2=> \d pollutiondeathsbylocation
+         Table "populationandpollution.pollutiondeathsbylocation"
+        Column        |       Type       | Collation | Nullable | Default 
+----------------------+------------------+-----------+----------+---------
+ location             | text             |           | not null | 
+ year                 | integer          |           | not null | 
+ totaldeathsper100k   | double precision |           | not null | 
+ outdoordeathsper100k | double precision |           | not null | 
+ indoordeathsper100k  | double precision |           | not null | 
+ ozonedeathsper100k   | double precision |           | not null | 
+Indexes:
+    "pollutiondeathsbylocation_pkey" PRIMARY KEY, btree (location, year)
+Check constraints:
+    "pollutiondeathsbylocation_indoordeathsper100k_check" CHECK (indoordeathsper100k >= 0::double precision)
+    "pollutiondeathsbylocation_outdoordeathsper100k_check" CHECK (outdoordeathsper100k >= 0::double precision)
+    "pollutiondeathsbylocation_ozonedeathsper100k_check" CHECK (ozonedeathsper100k >= 0::double precision)
+    "pollutiondeathsbylocation_totaldeathsper100k_check" CHECK (totaldeathsper100k >= 0::double precision)
+    "pollutiondeathsbylocation_year_check" CHECK (year >= 0)
+Foreign-key constraints:
+    "pollutiondeathsbylocation_location_fkey" FOREIGN KEY (location, year) REFERENCES population(location, year)
+
+csc343h-burnsco2=> \d pollutiondeathsbysdi
+           Table "populationandpollution.pollutiondeathsbysdi"
+        Column        |       Type       | Collation | Nullable | Default 
+----------------------+------------------+-----------+----------+---------
+ sdirank              | text             |           | not null | 
+ year                 | integer          |           | not null | 
+ totaldeathsper100k   | double precision |           | not null | 
+ outdoordeathsper100k | double precision |           | not null | 
+ indoordeathsper100k  | double precision |           | not null | 
+ ozonedeathsper100k   | double precision |           | not null | 
+Indexes:
+    "pollutiondeathsbysdi_pkey" PRIMARY KEY, btree (sdirank, year)
+Check constraints:
+    "pollutiondeathsbysdi_indoordeathsper100k_check" CHECK (indoordeathsper100k >= 0::double precision)
+    "pollutiondeathsbysdi_outdoordeathsper100k_check" CHECK (outdoordeathsper100k >= 0::double precision)
+    "pollutiondeathsbysdi_ozonedeathsper100k_check" CHECK (ozonedeathsper100k >= 0::double precision)
+    "pollutiondeathsbysdi_sdirank_check" CHECK (sdirank = 'Low SDI'::text OR sdirank = 'Low-middle SDI'::text OR sdirank = 'Middle SDI'::text OR sdirank = 'High-middle SDI'::text OR sdirank = 'High SDI'::text)
+    "pollutiondeathsbysdi_totaldeathsper100k_check" CHECK (totaldeathsper100k >= 0::double precision)
+    "pollutiondeathsbysdi_year_check" CHECK (year >= 0)
+
+csc343h-burnsco2=> SELECT count(*) from emissions;
+ count 
+-------
+   110
+(1 row)
+
+csc343h-burnsco2=> SELECT count(*) from population;
+ count 
+-------
+   114
+(1 row)
+
+csc343h-burnsco2=> SELECT count(*) from pollutiondeathsbylocation;
+ count 
+-------
+    60
+(1 row)
+
+csc343h-burnsco2=> SELECT count(*) from pollutiondeathsbysdi;
+ count 
+-------
+    20
+(1 row)
+
+csc343h-burnsco2=> SELECT * FROM population WHERE location='Canada' AND year > 1990;
+ location | year | popvalue 
+----------+------+----------
+ Canada   | 1991 |    27889
+ Canada   | 1992 |    28224
+ Canada   | 1993 |    28548
+ Canada   | 1994 |    28861
+ Canada   | 1995 |    29164
+ Canada   | 1996 |    29458
+ Canada   | 1997 |    29742
+ Canada   | 1998 |    30022
+ Canada   | 1999 |    30303
+ Canada   | 2000 |    30588
+ Canada   | 2001 |    30880
+ Canada   | 2002 |    31178
+ Canada   | 2003 |    31488
+ Canada   | 2004 |    31815
+ Canada   | 2005 |    32164
+(15 rows)
+
+csc343h-burnsco2=> SELECT * FROM emissions WHERE location='Brazil' AND year < 1990;
+ location | year |   tonnes    
+----------+------+-------------
+ Brazil   | 1985 | 179936803.4
+ Brazil   | 1986 | 197226217.1
+ Brazil   | 1987 | 205788741.6
+ Brazil   | 1988 | 207562967.6
+ Brazil   | 1989 | 212113643.7
+(5 rows)
+
+csc343h-burnsco2=> SELECT * FROM pollutiondeathsbylocation WHERE totaldeathsper100k > 50;
+ location | year | totaldeathsper100k | outdoordeathsper100k | indoordeathsper100k | ozonedeathsper100k 
+----------+------+--------------------+----------------------+---------------------+--------------------
+ Brazil   | 1990 |        74.96820394 |          44.08927983 |          28.3645954 |        3.330584207
+ Brazil   | 1991 |        71.52504713 |          41.12989233 |         27.91652838 |        3.272506325
+ Brazil   | 1992 |        69.97593943 |          39.07268896 |          28.3773666 |        3.321152882
+ Brazil   | 1993 |        69.34643707 |          37.34667875 |         29.37063428 |        3.439489571
+ Brazil   | 1994 |        66.74579837 |          34.60870934 |         29.48986301 |        3.445358532
+ Brazil   | 1995 |        63.54859167 |          31.67094869 |         29.22721468 |        3.430127304
+ Brazil   | 1996 |        60.67756777 |          28.99883016 |         29.05150605 |        3.388294763
+ Brazil   | 1997 |        57.64588616 |          26.46345086 |         28.61517672 |         3.30008531
+ Brazil   | 1998 |        55.80798642 |          24.57865801 |         28.66824548 |        3.280579176
+ Brazil   | 1999 |        53.55486901 |          22.57334214 |          28.4739981 |        3.199051783
+ Brazil   | 2000 |        50.99685632 |           20.8310204 |         27.74729906 |        3.073792117
+ World    | 1990 |   111.276364439682 |      61.114112925587 |    43.6784017395065 |   10.8810871343512
+ World    | 1991 |   110.072197219961 |     59.4997389740725 |    44.0688944612025 |   10.8553262280224
+ World    | 1992 |   108.892268641147 |     58.0143485313302 |    44.3864673667436 |   10.7777605011226
+ World    | 1993 |   107.759021594377 |     56.2525590737734 |    45.0315168765471 |   10.6772039629337
+ World    | 1994 |   106.142782640316 |     54.5761687031309 |    45.1333731990514 |   10.5506259412938
+ World    | 1995 |   103.909811104855 |     52.8375214473347 |    44.7236041255594 |   10.3464840358651
+ World    | 1996 |   102.003433399156 |     51.1188352376128 |    44.6209049022587 |   10.1644756575786
+ World    | 1997 |   100.554898708802 |     49.8825839205529 |    44.4750358959058 |   10.0317281396549
+ World    | 1998 |   98.6086343797261 |     48.3169180198379 |    44.1742498176755 |   9.86638343753956
+ World    | 1999 |   95.9729947855769 |     46.2033274222926 |    43.8419480549069 |   9.49944320157939
+ World    | 2000 |   93.7018855478395 |     44.5632077141905 |    43.3745992841462 |   9.19541846244477
+ World    | 2001 |   91.7177861689108 |     42.7877758327348 |    43.3438486079854 |   8.88695998244552
+ World    | 2002 |   90.1660780141522 |     41.2022333842924 |    43.5148612510971 |   8.64653336084249
+ World    | 2003 |   88.4720070199722 |     39.5764579853592 |    43.5783938344139 |   8.40863914515352
+ World    | 2004 |   85.5224198413889 |     37.6271670773764 |    42.8099240714329 |   8.01536064835582
+ World    | 2005 |   83.0897487454679 |     35.9143769168177 |    42.2915608423161 |   7.66130926249532
+ World    | 2006 |   80.4226259235425 |     34.1464325418398 |    41.6287982992989 |   7.27771836608584
+ World    | 2007 |   78.5316871283445 |     32.6370337590367 |    41.3899791922539 |   7.03937057147932
+ World    | 2008 |   77.2926824726339 |     31.3216975499373 |     41.538992850062 |   6.90695014257103
+ World    | 2009 |   76.0145386431221 |     30.1180637403902 |    41.5147319755761 |   6.81112893387913
+ World    | 2010 |   74.8577893692964 |     29.0003006999761 |    41.5215169454435 |   6.72114077113784
+ World    | 2011 |    73.599294713277 |     27.7581504411786 |    41.5898788184977 |   6.57588434974437
+ World    | 2012 |   71.0943859270424 |     26.9429312625717 |    39.9591144983157 |   6.40465577401974
+ World    | 2013 |   69.1305403084385 |     25.5083320417936 |    39.5335617773059 |   6.22870719001776
+ World    | 2014 |   67.3842042658963 |     24.5073895580385 |    38.7737191011941 |    6.1895894337253
+ World    | 2015 |   67.0815026475787 |     23.4518210481598 |    39.4939786034409 |   6.21431918408134
+ World    | 2016 |    65.150784602843 |      22.763017414829 |    38.2037008191113 |   6.21714423405512
+ World    | 2017 |   63.8229655963607 |     21.4660412885951 |    38.1543567077508 |   6.22627518057362
+(39 rows)
+
+csc343h-burnsco2=> SELECT * FROM pollutiondeathsbysdi WHERE sdiRank = 'High SDI' or sdiRank = 'Low SDI';
+ sdirank  | year | totaldeathsper100k | outdoordeathsper100k | indoordeathsper100k | ozonedeathsper100k 
+----------+------+--------------------+----------------------+---------------------+--------------------
+ High SDI | 1990 |        36.91852409 |          2.898962064 |         31.60684616 |        3.003491755
+ High SDI | 1991 |        36.24994039 |          2.697275917 |         31.13324286 |         3.00897206
+ High SDI | 1992 |        35.15921098 |          2.458852827 |         30.29805787 |        2.983635655
+ High SDI | 1993 |        34.64262987 |          2.255408199 |         29.95604984 |        3.012410327
+ Low SDI  | 1990 |        218.9306263 |          160.7867632 |         48.18433717 |        20.53245594
+ Low SDI  | 1991 |        215.6545062 |          157.3395792 |         48.44732524 |        20.30629037
+ Low SDI  | 1992 |        214.0806024 |          155.2701597 |         48.94803851 |         20.2164157
+ Low SDI  | 1993 |        210.3346807 |          152.1789644 |         48.48486621 |        19.76349397
+(8 rows)
+

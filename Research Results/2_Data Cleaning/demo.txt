@@ -1,0 +1,268 @@
+csc343h-burnsco2=> \i schema.ddl
+psql:schema.ddl:1: NOTICE:  table "population" does not exist, skipping
+DROP TABLE
+psql:schema.ddl:2: NOTICE:  table "emissions" does not exist, skipping
+DROP TABLE
+psql:schema.ddl:3: NOTICE:  table "pollutiondeathsbylocation" does not exist, skipping
+DROP TABLE
+psql:schema.ddl:4: NOTICE:  table "pollutiondeathsbysdi" does not exist, skipping
+DROP TABLE
+psql:schema.ddl:5: NOTICE:  table "temp_pop" does not exist, skipping
+DROP TABLE
+psql:schema.ddl:6: NOTICE:  table "temp_pollution_deaths" does not exist, skipping
+DROP TABLE
+psql:schema.ddl:7: NOTICE:  table "temp_emissions" does not exist, skipping
+DROP TABLE
+psql:schema.ddl:8: NOTICE:  view "validemissions" does not exist, skipping
+DROP VIEW
+psql:schema.ddl:9: NOTICE:  view "validpollutiondeaths" does not exist, skipping
+DROP VIEW
+psql:schema.ddl:10: NOTICE:  drop cascades to 4 other objects
+DETAIL:  drop cascades to table populationandpollution.population
+drop cascades to table populationandpollution.emissions
+drop cascades to table populationandpollution.pollutiondeathsbylocation
+drop cascades to table populationandpollution.pollutiondeathsbysdi
+DROP SCHEMA
+CREATE SCHEMA
+SET
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+COPY 42
+CREATE TABLE
+COPY 42
+CREATE TABLE
+COPY 6468
+INSERT 0 42
+psql:schema.ddl:140: NOTICE:  view "validemissions" will be a temporary view
+CREATE VIEW
+INSERT 0 42
+INSERT 0 140
+psql:schema.ddl:150: NOTICE:  view "validpollutiondeaths" will be a temporary view
+CREATE VIEW
+INSERT 0 32
+DROP TABLE
+psql:schema.ddl:159: NOTICE:  drop cascades to view validpollutiondeaths
+DROP TABLE
+psql:schema.ddl:160: NOTICE:  drop cascades to view validemissions
+DROP TABLE
+psql:schema.ddl:161: NOTICE:  view "validemissions" does not exist, skipping
+DROP VIEW
+psql:schema.ddl:162: NOTICE:  view "validpollutiondeaths" does not exist, skipping
+DROP VIEW
+csc343h-burnsco2=> SELECT * FROM pollutiondeathsbylocation;
+csc343h-burnsco2=> 
+csc343h-burnsco2=> \i schema.ddl
+psql:schema.ddl:1: NOTICE:  drop cascades to 2 other objects
+DETAIL:  drop cascades to constraint emissions_location_fkey on table emissions
+drop cascades to constraint pollutiondeathsbylocation_location_fkey on table pollutiondeathsbylocation
+DROP TABLE
+DROP TABLE
+DROP TABLE
+DROP TABLE
+psql:schema.ddl:5: NOTICE:  table "temp_pop" does not exist, skipping
+DROP TABLE
+psql:schema.ddl:6: NOTICE:  table "temp_pollution_deaths" does not exist, skipping
+DROP TABLE
+psql:schema.ddl:7: NOTICE:  table "temp_emissions" does not exist, skipping
+DROP TABLE
+psql:schema.ddl:8: NOTICE:  view "validemissions" does not exist, skipping
+DROP VIEW
+psql:schema.ddl:9: NOTICE:  view "validpollutiondeaths" does not exist, skipping
+DROP VIEW
+DROP SCHEMA
+CREATE SCHEMA
+SET
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+COPY 42
+CREATE TABLE
+COPY 42
+CREATE TABLE
+COPY 62
+INSERT 0 42
+psql:schema.ddl:140: NOTICE:  view "validemissions" will be a temporary view
+CREATE VIEW
+INSERT 0 42
+INSERT 0 20
+psql:schema.ddl:150: NOTICE:  view "validpollutiondeaths" will be a temporary view
+CREATE VIEW
+INSERT 0 32
+DROP TABLE
+psql:schema.ddl:159: NOTICE:  drop cascades to view validpollutiondeaths
+DROP TABLE
+psql:schema.ddl:160: NOTICE:  drop cascades to view validemissions
+DROP TABLE
+psql:schema.ddl:161: NOTICE:  view "validemissions" does not exist, skipping
+DROP VIEW
+psql:schema.ddl:162: NOTICE:  view "validpollutiondeaths" does not exist, skipping
+DROP VIEW
+
+
+
+csc343h-burnsco2=> \d emissions
+           Table "populationandpollution.emissions"
+  Column  |       Type       | Collation | Nullable | Default 
+----------+------------------+-----------+----------+---------
+ location | text             |           | not null | 
+ year     | integer          |           | not null | 
+ tonnes   | double precision |           | not null | 
+Indexes:
+    "emissions_pkey" PRIMARY KEY, btree (location, year)
+Check constraints:
+    "emissions_tonnes_check" CHECK (tonnes >= 0::double precision)
+    "emissions_year_check" CHECK (year >= 0)
+Foreign-key constraints:
+    "emissions_location_fkey" FOREIGN KEY (location, year) REFERENCES population(location, year)
+
+
+
+csc343h-burnsco2=> \d population
+      Table "populationandpollution.population"
+  Column  |  Type   | Collation | Nullable | Default 
+----------+---------+-----------+----------+---------
+ location | text    |           | not null | 
+ year     | integer |           | not null | 
+ popvalue | integer |           | not null | 
+Indexes:
+    "population_pkey" PRIMARY KEY, btree (location, year)
+Check constraints:
+    "population_popvalue_check" CHECK (popvalue >= 0)
+    "population_year_check" CHECK (year >= 0)
+Referenced by:
+    TABLE "emissions" CONSTRAINT "emissions_location_fkey" FOREIGN KEY (location, year) REFERENCES population(location, year)
+    TABLE "pollutiondeathsbylocation" CONSTRAINT "pollutiondeathsbylocation_location_fkey" FOREIGN KEY (location, year) REFERENCES population(location, year)
+
+
+
+csc343h-burnsco2=> \d pollutiondeathsbylocation
+    Table "populationandpollution.pollutiondeathsbylocation"
+        Column        |  Type   | Collation | Nullable | Default 
+----------------------+---------+-----------+----------+---------
+ location             | text    |           | not null | 
+ year                 | integer |           | not null | 
+ totaldeathsper100k   | integer |           | not null | 
+ outdoordeathsper100k | integer |           | not null | 
+ indoordeathsper100k  | integer |           | not null | 
+ ozonedeathsper100k   | integer |           | not null | 
+Indexes:
+    "pollutiondeathsbylocation_pkey" PRIMARY KEY, btree (location, year)
+Check constraints:
+    "pollutiondeathsbylocation_indoordeathsper100k_check" CHECK (indoordeathsper100k >= 0)
+    "pollutiondeathsbylocation_outdoordeathsper100k_check" CHECK (outdoordeathsper100k >= 0)
+    "pollutiondeathsbylocation_ozonedeathsper100k_check" CHECK (ozonedeathsper100k >= 0)
+    "pollutiondeathsbylocation_totaldeathsper100k_check" CHECK (totaldeathsper100k >= 0)
+    "pollutiondeathsbylocation_year_check" CHECK (year >= 0)
+Foreign-key constraints:
+    "pollutiondeathsbylocation_location_fkey" FOREIGN KEY (location, year) REFERENCES population(location, year)
+
+
+
+csc343h-burnsco2=> \d pollutiondeathsbysdi
+       Table "populationandpollution.pollutiondeathsbysdi"
+        Column        |  Type   | Collation | Nullable | Default 
+----------------------+---------+-----------+----------+---------
+ sdirank              | text    |           | not null | 
+ year                 | integer |           | not null | 
+ totaldeathsper100k   | integer |           | not null | 
+ outdoordeathsper100k | integer |           | not null | 
+ indoordeathsper100k  | integer |           | not null | 
+ ozonedeathsper100k   | integer |           | not null | 
+Indexes:
+    "pollutiondeathsbysdi_pkey" PRIMARY KEY, btree (sdirank, year)
+Check constraints:
+    "pollutiondeathsbysdi_indoordeathsper100k_check" CHECK (indoordeathsper100k >= 0)
+    "pollutiondeathsbysdi_outdoordeathsper100k_check" CHECK (outdoordeathsper100k >= 0)
+    "pollutiondeathsbysdi_ozonedeathsper100k_check" CHECK (ozonedeathsper100k >= 0)
+    "pollutiondeathsbysdi_sdirank_check" CHECK (sdirank = 'Low SDI'::text OR sdirank = 'Low-middle SDI'::text OR sdirank = 'Middle SDI'::text OR sdirank = 'High-middle SDI'::text OR sdirank = 'High SDI'::text)
+    "pollutiondeathsbysdi_totaldeathsper100k_check" CHECK (totaldeathsper100k >= 0)
+    "pollutiondeathsbysdi_year_check" CHECK (year >= 0)
+
+csc343h-burnsco2=> SELECT count(*) from emissions;
+ count 
+-------
+    42
+(1 row)
+
+csc343h-burnsco2=> SELECT count(*) from population;
+ count 
+-------
+    42
+(1 row)
+
+csc343h-burnsco2=> SELECT count(*) from pollutiondeathsbylocation;
+ count 
+-------
+    32
+(1 row)
+
+csc343h-burnsco2=> SELECT count(*) from pollutiondeathsbysdi;
+ count 
+-------
+    20
+(1 row)
+
+
+csc343h-burnsco2=> SELECT * FROM population WHERE location='Canada' AND year > 1990;
+ location | year | popvalue 
+----------+------+----------
+ Canada   | 1991 |    27889
+ Canada   | 1992 |    28224
+ Canada   | 1993 |    28548
+ Canada   | 1994 |    28861
+ Canada   | 1995 |    29164
+ Canada   | 1996 |    29458
+ Canada   | 1997 |    29742
+ Canada   | 1998 |    30022
+ Canada   | 1999 |    30303
+ Canada   | 2000 |    30588
+ Canada   | 2001 |    30880
+ Canada   | 2002 |    31178
+ Canada   | 2003 |    31488
+ Canada   | 2004 |    31815
+ Canada   | 2005 |    32164
+(15 rows)
+
+csc343h-burnsco2=> SELECT * FROM emissions WHERE location='Brazil' AND year < 1990;
+ location | year |   tonnes    
+----------+------+-------------
+ Brazil   | 1985 | 179936803.4
+ Brazil   | 1986 | 197226217.1
+ Brazil   | 1987 | 205788741.6
+ Brazil   | 1988 | 207562967.6
+ Brazil   | 1989 | 212113643.7
+(5 rows)
+
+csc343h-burnsco2=> SELECT * FROM pollutiondeathsbylocation WHERE totaldeathsper100k > 50; 
+ location | year | totaldeathsper100k | outdoordeathsper100k | indoordeathsper100k | ozonedeathsper100k 
+----------+------+--------------------+----------------------+---------------------+--------------------
+ Brazil   | 1990 |                 75 |                   44 |                  28 |                  3
+ Brazil   | 1991 |                 72 |                   41 |                  28 |                  3
+ Brazil   | 1992 |                 70 |                   39 |                  28 |                  3
+ Brazil   | 1993 |                 69 |                   37 |                  29 |                  3
+ Brazil   | 1994 |                 67 |                   35 |                  29 |                  3
+ Brazil   | 1995 |                 64 |                   32 |                  29 |                  3
+ Brazil   | 1996 |                 61 |                   29 |                  29 |                  3
+ Brazil   | 1997 |                 58 |                   26 |                  29 |                  3
+ Brazil   | 1998 |                 56 |                   25 |                  29 |                  3
+ Brazil   | 1999 |                 54 |                   23 |                  28 |                  3
+ Brazil   | 2000 |                 51 |                   21 |                  28 |                  3
+(11 rows)
+
+csc343h-burnsco2=> SELECT * FROM pollutiondeathsbysdi WHERE sdiRank = 'High SDI' or sdiRank = 'Low SDI';
+ sdirank  | year | totaldeathsper100k | outdoordeathsper100k | indoordeathsper100k | ozonedeathsper100k 
+----------+------+--------------------+----------------------+---------------------+--------------------
+ High SDI | 1990 |                 37 |                    3 |                  32 |                  3
+ High SDI | 1991 |                 36 |                    3 |                  31 |                  3
+ High SDI | 1992 |                 35 |                    2 |                  30 |                  3
+ High SDI | 1993 |                 35 |                    2 |                  30 |                  3
+ Low SDI  | 1990 |                219 |                  161 |                  48 |                 21
+ Low SDI  | 1991 |                216 |                  157 |                  48 |                 20
+ Low SDI  | 1992 |                214 |                  155 |                  49 |                 20
+ Low SDI  | 1993 |                210 |                  152 |                  48 |                 20
+(8 rows)
