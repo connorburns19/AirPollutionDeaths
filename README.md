@@ -11,3 +11,10 @@ https://population.un.org/wpp/Download/Standard/CSV/
 2. Does socio-demographic index have an effect on the number of deaths from air
 pollution? <br/>
 3. Is there a general correlation between population and the amount of emissions?
+
+# Quick Answers
+1. No <br/>
+2. Yes <br/>
+3. Yes <br/> <br/>
+
+Note that these answers are biased to the selected datasets, and are not truly conclusive.
