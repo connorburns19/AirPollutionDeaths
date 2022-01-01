@@ -17,4 +17,4 @@ pollution? <br/>
 2. Yes <br/>
 3. Yes <br/> <br/>
 
-Note that these answers are biased to the selected datasets, and are not truly conclusive.
+Note that these answers are biased to the selected datasets, and are not truly conclusive. Read the discussion pdf for more detail.
